@@ -66,9 +66,9 @@ else:
 # Build the initial lists from the data acquired from SickBeard.
 # Sort list between a status of Snatched or Downloaded for the last 24 hours
 snatched_shows = [show for show in show_data if show['status'] == 'Snatched'
-    and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
+                  and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
 download_shows = [show for show in show_data if show['status'] == 'Downloaded'
-    and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
+                  and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
 
 # Create a unique ID with the show_name season number and episode number.
 snatched_ids = [show['show_name'] + str(show['season']) + str(show['episode']) for show in snatched_shows]
@@ -84,7 +84,7 @@ incomplete_shows_ids = [snatched_id for snatched_id in snatched_ids if snatched_
 
 # Create a list of failed shows
 incomplete_shows = [show for show in snatched_shows if show['show_name'] + str(show['season']) + str(show['episode'])
-    in incomplete_shows_ids]
+                    in incomplete_shows_ids]
 
 # Take the incomplete list and compare the 'date' key to see if it is older then 1 hour.
 # If older then 1 hour print the Show Episode Info
@@ -138,10 +138,10 @@ if body:
     #Send email
 
     message = \
-            "From: {sender}\n" \
-            "To: {receivers}\n" \
-            "Subject: {subject}\n \n" \
-            "{body}".format(sender=config.sender, receivers=config.recipient, subject=config.subject, body=body)
+        "From: {sender}\n" \
+        "To: {receivers}\n" \
+        "Subject: {subject}\n \n" \
+        "{body}".format(sender=config.sender, receivers=config.recipient, subject=config.subject, body=body)
 
     session = smtplib.SMTP(config.server, config.port)
 
