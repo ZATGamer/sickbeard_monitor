@@ -128,13 +128,7 @@ else:
 
 
 if body:
-    # server = 'smtp.gmail.com'
-    # port = 587
-    #
-    # password = 'XXXX'
-    # sender = 'XXXX'
-    # recipient = 'XXXX'
-    # subject = 'SickBeared Report'
+    #Config can be found in config.py
     #Send email
 
     message = \
