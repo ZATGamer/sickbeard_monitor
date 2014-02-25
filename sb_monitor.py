@@ -83,7 +83,8 @@ download_ids = [show['show_name'] + str(show['season']) + str(show['episode']) f
 incomplete_shows_ids = [snatched_id for snatched_id in snatched_ids if snatched_id not in download_ids]
 
 # Create a list of failed shows
-incomplete_shows = [show for show in snatched_shows if show['show_name'] + str(show['season']) + str(show['episode']) in incomplete_shows_ids]
+incomplete_shows = [show for show in snatched_shows if show['show_name'] + str(show['season']) + str(show['episode'])
+    in incomplete_shows_ids]
 
 # Take the incomplete list and compare the 'date' key to see if it is older then 1 hour.
 # If older then 1 hour print the Show Episode Info
@@ -107,21 +108,19 @@ if download_report:
 
 
 
-#This needs to be reworked as it will always send an email. I only want emails sent if always_email is set to true.
-
 # Combine the body's based on settings
-# Nothing happened email
 if always_email:
     if not failed_body and not downloaded_body:
+        # Nothing downloaded
         body = 'Nothing Downloaded Today.'
-        # Nothing failed but something finished downloading
     elif not failed_body and downloaded_body:
+        # Nothing failed but something finished downloading
         body = downloaded_message + downloaded_body
-        # Something failed and nothing finished downloading
     elif failed_body and not downloaded_body:
+        # Something failed and nothing finished downloading
         body = failed_message + failed_body
-        # Something failed and something finished downloading
     elif failed_body and downloaded_body:
+        # Something failed and something finished downloading
         body = failed_message + failed_body + '\n' + downloaded_message + downloaded_body
 else:
     if failed_body:
@@ -143,7 +142,6 @@ if body:
             "To: {receivers}\n" \
             "Subject: {subject}\n \n" \
             "{body}".format(sender=config.sender, receivers=config.recipient, subject=config.subject, body=body)
-
 
     session = smtplib.SMTP(config.server, config.port)
 
