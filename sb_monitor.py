@@ -7,6 +7,9 @@ import smtplib
 import config
 
 
+# First thing when the script runs is to check if the config exists
+'''add some code here to check if this is the first run or not'''
+
 ################
 ### SETTINGS ###
 ################
@@ -107,7 +110,6 @@ if download_report:
             episode_number=download_show['episode'])
 
 
-
 # Combine the body's based on settings
 if always_email:
     if not failed_body and not downloaded_body:
@@ -143,6 +145,5 @@ if body:
     session.starttls()
     session.ehlo()
     session.login(config.sender, config.password)
-
     session.sendmail(config.sender, config.recipient, message)
     session.quit()
