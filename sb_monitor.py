@@ -5,10 +5,17 @@ import json
 import datetime
 import smtplib
 import config
-
+import ConfigParser
 
 # First thing when the script runs is to check if the config exists
-'''add some code here to check if this is the first run or not'''
+configfile = ConfigParser.RawConfigParser()
+configfile.read('config.cfg')
+
+if configfile.get('FirstRun', 'is_first') == 'True':
+    has_run = 'First Time'
+else:
+    has_run = "NOT First Time"
+
 
 ################
 ### SETTINGS ###
@@ -60,7 +67,7 @@ if testing:
         show_data = []
 
 else:
-    response = requests.get('http://192.168.1.50:8081/api/9e3f7e9fb264faabf54be2d63147306a/?cmd=history')
+    response = requests.get('http://' + configfile.get('SBInfo', 'sb_address') + ':' + configfile.get('SBInfo', 'sb_port') + '/api/' + configfile.get('SBInfo', 'sb_api') + '/?cmd=history')
     my_data = json.loads(response.content)
 
     for status in my_data['data']:
@@ -137,13 +144,16 @@ if body:
         "From: {sender}\n" \
         "To: {receivers}\n" \
         "Subject: {subject}\n \n" \
-        "{body}".format(sender=config.sender, receivers=config.recipient, subject=config.subject, body=body)
+        "{body}".format(sender=configfile.get('EmailInfo', 'sender'),
+                        receivers=configfile.get('EmailInfo', 'recipient'),
+                        subject=configfile.get('EmailInfo', 'subject'),
+                        body=body)
 
-    session = smtplib.SMTP(config.server, config.port)
+    session = smtplib.SMTP(configfile.get('EmailInfo', 'server'), int(configfile.get('EmailInfo', 'port')))
 
     session.ehlo()
     session.starttls()
     session.ehlo()
-    session.login(config.sender, config.password)
-    session.sendmail(config.sender, config.recipient, message)
+    session.login(configfile.get('EmailInfo', 'sender'), configfile.get('EmailInfo', 'password'))
+    session.sendmail(configfile.get('EmailInfo', 'sender'), configfile.get('EmailInfo', 'recipient'), message)
     session.quit()
