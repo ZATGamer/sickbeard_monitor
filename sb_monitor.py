@@ -1,11 +1,10 @@
-__author__ = 'Anthony Barragree'
-
 import requests
 import json
 import datetime
 import smtplib
 import config
 import ConfigParser
+
 
 # First thing when the script runs is to check if the config exists
 configfile = ConfigParser.RawConfigParser()
@@ -34,51 +33,73 @@ always_email = True
 
 ### Variables
 # Getting the time for later use
-today = datetime.datetime.now() - datetime.timedelta(days=1)
+date = datetime.datetime.now() - datetime.timedelta(days=1)
 failed_message = 'The following shows failed to download.\n'
 downloaded_message = 'The following shows were downloaded today.\n'
 failed_body = ''
 downloaded_body = ''
 body = ''
-show_data = []
 
 ### TESTING? ###
 # 2 must be true to get something
-testing = False
-testing_failed_only = False
-testing_download_only = False
-testing_both_failed_download = False
-testing_nothing = True
+# testing = False
+# testing_failed_only = False
+# testing_download_only = False
+# testing_both_failed_download = False
+# testing_nothing = True
 
 # TEST DATA:
-if testing:
-    today = datetime.datetime.strptime('2014-02-20 01:01', '%Y-%m-%d %H:%M')
-    if testing_failed_only:
-        # all shows should show as BAD
-        show_data = [{u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}]
-    elif testing_download_only:
-        # all shows should show as GOOD
-        show_data = [{u'status': u'Downloaded', u'resource': u'The.Following.S02E04.mkv', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'D:\\The.Following.S02E04', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Downloaded', u'resource': u'Intelligence.US.S01E06.mkv', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'D:\\Intelligence.US.S01E06', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}, {u'status': u'Downloaded', u'resource': u'Almost.Human.S01E10.mkv', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'D:\\Almost.Human.S01E10', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 10, u'quality': u'HD TV'}]
-    elif testing_both_failed_download:
-        # The Following should show GOOD, Almost Human and Intelligence should show BAD
-        show_data = [{u'status': u'Downloaded', u'resource': u'The.Following.S02E04.mkv', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'D:\\The.Following.S02E04', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}]
-    elif testing_nothing:
-        # This is to test that nothing was received from SickBeard
-        show_data = []
+# if testing:
+#     today = datetime.datetime.strptime('2014-02-20 01:01', '%Y-%m-%d %H:%M')
+#     if testing_failed_only:
+#         # all shows should show as BAD
+#         show_data = [{u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}]
+#     elif testing_download_only:
+#         # all shows should show as GOOD
+#         show_data = [{u'status': u'Downloaded', u'resource': u'The.Following.S02E04.mkv', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'D:\\The.Following.S02E04', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Downloaded', u'resource': u'Intelligence.US.S01E06.mkv', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'D:\\Intelligence.US.S01E06', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}, {u'status': u'Downloaded', u'resource': u'Almost.Human.S01E10.mkv', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'D:\\Almost.Human.S01E10', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 10, u'quality': u'HD TV'}]
+#     elif testing_both_failed_download:
+#         # The Following should show GOOD, Almost Human and Intelligence should show BAD
+#         show_data = [{u'status': u'Downloaded', u'resource': u'The.Following.S02E04.mkv', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'D:\\The.Following.S02E04', u'provider': u'DIMENSION', u'date': u'2014-02-20 12:30', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'The.Following.S02E04', u'tvdbid': 258744, u'season': 2, u'show_name': u'The Following', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 4, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Intelligence.US.S01E06', u'tvdbid': 267260, u'season': 1, u'show_name': u'Intelligence (2014)', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 6, u'quality': u'HD TV'}, {u'status': u'Snatched', u'resource': u'Almost.Human.S01E10', u'tvdbid': 267702, u'season': 1, u'show_name': u'Almost Human', u'resource_path': u'', u'provider': u'nzb.su', u'date': u'2014-02-20 12:00', u'episode': 10, u'quality': u'HD TV'}]
+#     elif testing_nothing:
+#         # This is to test that nothing was received from SickBeard
+#         show_data = []
 
-else:
-    response = requests.get('http://' + configfile.get('SBInfo', 'sb_address') + ':' + configfile.get('SBInfo', 'sb_port') + '/api/' + configfile.get('SBInfo', 'sb_api') + '/?cmd=history')
+
+def call_sb(sb_address, sb_port, sb_api, status_type):
+    show_data = []
+    # This function will call SickBeard and return the requested data.
+    response = requests.get(
+        'http://{}:{}/api/{}/?cmd=history&type={}'.format(
+            sb_address, sb_port, sb_api, status_type))
     my_data = json.loads(response.content)
-
     for status in my_data['data']:
         show_data.append(status)
+    return show_data
 
-# Build the initial lists from the data acquired from SickBeard.
-# Sort list between a status of Snatched or Downloaded for the last 24 hours
-snatched_shows = [show for show in show_data if show['status'] == 'Snatched'
-                  and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
-download_shows = [show for show in show_data if show['status'] == 'Downloaded'
-                  and datetime.datetime.strptime(show['date'], '%Y-%m-%d %H:%M') >= today]
+def trim_shows(shows, date):
+    # This function will trim down the list depending on the date set in the config.
+    pruned_shows = [
+        show for show in shows if
+        datetime.datetime.strptime(
+            show['date'], '%Y-%m-%d %H:%M') >= date
+    ]
+    return pruned_shows
+
+# I believe there is a way to get the json list and trim down the data in one call.
+full_snatched = call_sb(configfile.get('SBInfo', 'sb_address'),
+                        configfile.get('SBInfo', 'sb_port'),
+                        configfile.get('SBInfo', 'sb_api'),
+                        'snatched')
+
+full_downloaded = call_sb(configfile.get('SBInfo', 'sb_address'),
+                        configfile.get('SBInfo', 'sb_port'),
+                        configfile.get('SBInfo', 'sb_api'),
+                        'downloaded')
+
+snatched_shows = trim_shows(full_snatched, date)
+
+download_shows = trim_shows(full_downloaded, date)
+
 
 # Create a unique ID with the show_name season number and episode number.
 snatched_ids = [show['show_name'] + str(show['season']) + str(show['episode']) for show in snatched_shows]
