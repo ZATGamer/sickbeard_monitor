@@ -2,10 +2,20 @@ import requests
 import json
 import datetime
 import smtplib
-import config
 import ConfigParser
+import startup_config
 
 # First thing when the script runs is to check if the config exists
+try:
+    with open('config.cfg') as f:
+        config_exist = True
+except IOError:
+    config_exist = False
+
+if not config_exist:
+    startup_config.startup_config()
+
+# Open and read the config file.
 configfile = ConfigParser.RawConfigParser()
 configfile.read('config.cfg')
 
