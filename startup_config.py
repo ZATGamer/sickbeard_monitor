@@ -1,4 +1,6 @@
 import ConfigParser
+# This is a very rough initial pass of getting config into the config file.
+# This will change a lot and I learn how to do this stuff.
 
 
 def startup_config():
