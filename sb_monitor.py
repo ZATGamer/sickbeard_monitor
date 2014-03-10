@@ -5,46 +5,6 @@ import smtplib
 import ConfigParser
 import startup_config
 
-# First thing when the script runs is to check if the config exists
-try:
-    with open('config.cfg') as f:
-        config_exist = True
-except IOError:
-    config_exist = False
-
-if not config_exist:
-    startup_config.startup_config()
-
-# Open and read the config file.
-configfile = ConfigParser.RawConfigParser()
-configfile.read('config.cfg')
-
-################
-### SETTINGS ###
-################
-
-# Show all downloaded shows for the day?
-download_report = True
-
-# Show all failed shows for the day?
-failed_report = True
-
-# Should I send an email if nothing downloaded at all?
-always_email = True
-
-### END OF SETTINGS ###
-
-### Variables
-# Getting the time for later use
-date = datetime.datetime.now() - datetime.timedelta(days=int(configfile.get('General', 'days')))
-time = int(configfile.get('General', 'time'))
-failed_message = 'The following shows failed to download.\n'
-downloaded_message = 'The following shows were downloaded today.\n'
-failed_body = ''
-downloaded_body = ''
-body = ''
-
-
 def call_sb(sb_address, sb_port, sb_api, status_type):
     show_data = []
     # This function will call SickBeard and return the requested data.
@@ -79,6 +39,39 @@ def build_report(episodes):
 
 
 if __name__ == '__main__':
+    # First thing when the script runs is to check if the config exists
+    try:
+        with open('config.cfg') as f:
+            config_exist = True
+    except IOError:
+        config_exist = False
+
+    if not config_exist:
+        startup_config.startup_config()
+
+    # Open and read the config file.
+    configfile = ConfigParser.RawConfigParser()
+    configfile.read('config.cfg')
+
+    # Show all downloaded shows for the day?
+    download_report = True
+
+    # Show all failed shows for the day?
+    failed_report = True
+
+    # Should I send an email if nothing downloaded at all?
+    always_email = True
+
+    ### Variables
+    # Getting the time for later use
+    date = datetime.datetime.now() - datetime.timedelta(days=int(configfile.get('General', 'days')))
+    time = int(configfile.get('General', 'time'))
+    failed_message = 'The following shows failed to download.\n'
+    downloaded_message = 'The following shows were downloaded today.\n'
+    failed_body = ''
+    downloaded_body = ''
+    body = ''
+
     # Call SickBeard and get snatched shows.
     full_snatched = call_sb(configfile.get('SBInfo', 'sb_address'),
                             configfile.get('SBInfo', 'sb_port'),
