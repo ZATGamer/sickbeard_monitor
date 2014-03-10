@@ -93,8 +93,7 @@ if __name__ == '__main__':
     #Dertermin if the trimmed lists are blank.
     if not snatched_shows and not download_shows:
         if always_email:
-            body = 'Not A Single TV Show Downloaded Today, Either You Don\'t Watch Enough TV or Something Is Not \
-            Working... Are You Sure Everything Is Working?'
+            body = 'Nothing Downloaded Yesterday.'
     else:
         # Create a unique ID with the show_name season number and episode number.
         snatched_ids = [show['show_name'] + str(show['season']) + str(show['episode']) for show in snatched_shows]
