@@ -5,6 +5,15 @@ import smtplib
 import ConfigParser
 import startup_config
 
+
+def check_config():
+    try:
+        with open('config.cfg'):
+            return True
+    except IOError:
+        return False
+
+
 def call_sb(sb_address, sb_port, sb_api, status_type):
     show_data = []
     # This function will call SickBeard and return the requested data.
@@ -40,13 +49,7 @@ def build_report(episodes):
 
 if __name__ == '__main__':
     # First thing when the script runs is to check if the config exists
-    try:
-        with open('config.cfg') as f:
-            config_exist = True
-    except IOError:
-        config_exist = False
-
-    if not config_exist:
+    if not check_config():
         startup_config.startup_config()
 
     # Open and read the config file.
