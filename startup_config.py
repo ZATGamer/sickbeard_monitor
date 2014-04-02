@@ -3,15 +3,19 @@ import ConfigParser
 # This will change a lot and I learn how to do this stuff.
 
 
+def write_config(config):
+    with open('config.cfg', 'wb') as configfile:
+        config.write(configfile)
+
+
+def initial_setup(config):
+    config.add_section('SBInfo')
+    config.add_section('EmailInfo')
+    config.add_section('General')
+
+
 def startup_config():
     config = ConfigParser.RawConfigParser()
-
-    # This is the bit that will get all the config on the first run for simple user setup.
-    config.add_section('FirstRun')
-    config.set('FirstRun', 'is_first', 'False')
-
-    #with open('config.cfg', 'wb') as configfile:
-    #    config.write(configfile)
 
     # Get SickBeard server info.
     config.add_section('SBInfo')
@@ -43,7 +47,6 @@ def startup_config():
     config.set('General', 'days', raw_input('How many days do you want the report to contain?'))
     # Get how long the timeout value should be
     config.set('General', 'time', raw_input('How long should the timeout value be (in hours)?'))
-
 
     # Get if they always want a report or just when something fails.
 
